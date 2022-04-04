@@ -27,17 +27,18 @@ typedef struct
 ListaConectados MiLista;
 
 
-int PonConectado (ListaConectados *lista, char nombre[50], int socket)
+int PonConectado (char nombre[50], int socket)
 {
-	if (lista->num == 100)
+	if (MiLista.num == 100)
 		return -1;
 	
 	else
 	{
 		pthread_mutex_lock(&mutex);//no se escribe asi, mirar en la leccion 3, tmb se debe añadir en la funcion eliminar
-		strcpy (lista->conectados[lista->num].nombre, nombre);
-		lista->conectados[lista->num].socket = socket;
-		lista->num++;
+		strcpy (MiLista.conectados[MiLista.num].nombre, nombre);
+		MiLista.conectados[MiLista.num].socket = socket;
+		MiLista.num++;
+		printf("loggeado\n");
 		pthread_mutex_unlock(&mutex);//no se escribe asi, mirar en la leccion 3, tmb se debe añadir en la funcion eliminar
 		return 0;
 		
@@ -59,7 +60,7 @@ int PonConectado (ListaConectados *lista, char nombre[50], int socket)
 				found==1;
 				for (int j=0;j<lista->num;j++)
 				{
-					strcpy(lista->conectados[j].nombre,lista->conectados[j].nombre);
+					strcpy(lista->conectados[j].nombre,lista->conectados[j+1].nombre);
 					lista->conectados[j].socket=lista->conectados[j+1].socket;
 				}
 				lista->num--;
@@ -69,18 +70,20 @@ int PonConectado (ListaConectados *lista, char nombre[50], int socket)
 	
 	}
 
-	void ShowConectados(ListaConectados *lista, char *respuesta[512])
+	void ShowConectados(char respuesta[512])
 	{
 		pthread_mutex_lock(&mutex);
-		sprintf(&respuesta, "%d/",lista->num);
+		char respuestaAUX[200];
+		sprintf(respuesta,"%d/",MiLista.num);
 		int i; 
-		for (i=0; i<lista->num; i++)
+		for (i=0; i<MiLista.num; i++)
 		{
-			sprintf(respuesta,"%s%s/",respuesta,lista->conectados[i].nombre);
+			sprintf(respuestaAUX,"%s%s/",respuestaAUX,MiLista.conectados[i].nombre);
 		}
-		respuesta[strlen(respuesta)-1] = '\0';
-		printf("%s\n",&respuesta);
-		pthread_mutex_lock(&mutex);
+		respuestaAUX[strlen(respuestaAUX)-1] = '\0';
+		strcat(respuesta,respuestaAUX);
+		printf("%s <-respuesta\n",respuesta);
+		pthread_mutex_unlock(&mutex);
 	}
 
 
@@ -338,7 +341,7 @@ void *AtenderCliente (void *socket, ListaConectados *miLista)
 			{
 				printf ("Nombre del jugador\n");
 				printf ("Username: %s\n", row[0]);
-				int res = PonConectado(&miLista,&nombre,sock_conn);
+				int res = PonConectado(nombre,sock_conn);
 				if (res==-1)
 					printf("Log in failed, tabla llena\n");
 				strcpy(respuesta,"Logueado correctamente");
@@ -401,9 +404,8 @@ void *AtenderCliente (void *socket, ListaConectados *miLista)
 		
 		else if (codigo == 6)
 		{
-			ShowConectados(&miLista, &respuesta[512]);
-			printf("1\n");
-			write (sock_conn,&respuesta, strlen(respuesta));
+			ShowConectados(respuesta);
+			write (sock_conn,respuesta,strlen(respuesta));
 		}
 		
 	}
