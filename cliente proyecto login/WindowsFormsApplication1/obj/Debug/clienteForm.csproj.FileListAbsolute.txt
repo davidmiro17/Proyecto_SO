@@ -148,7 +148,6 @@ C:\Users\ferra\Desktop\Mi_prouecto-main\cliente proyecto login\WindowsFormsAppli
 C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
 C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
 C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb
-C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\clienteForm.csprojAssemblyReference.cache
 C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Form1.resources
 C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Form2.resources
 C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
@@ -167,3 +166,4 @@ C:\share\Proyecto\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\ob
 C:\share\Proyecto\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.CoreCompileInputs.cache
 C:\share\Proyecto\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.exe
 C:\share\Proyecto\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.pdb
+C:\share\Proyecto_SO\cliente proyecto login\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.AssemblyReference.cache

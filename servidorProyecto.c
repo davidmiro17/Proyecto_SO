@@ -24,27 +24,24 @@ typedef struct
 	int num;
 } ListaConectados;
 
+ListaConectados MiLista;
 
-
-	int PonConectado (char nombre[20], int socket, ListaConectados MiLista)
+	int PonConectado (ListaConectados *MiLista, char nombre[20], int socket)
 	{
-		if (MiLista.num == 100)
+		if (MiLista->num == 100)
 			return -1;
 		else
 		{
-			pthread_mutex_lock(&mutex);
-			strcpy (MiLista.conectados[MiLista.num].nombre, nombre);
-			MiLista.conectados[MiLista.num].socket = socket;
-			MiLista.num++;
-			printf("loggeado\n");
-			pthread_mutex_unlock(&mutex);
+			strcpy (MiLista->conectados[MiLista->num].nombre, nombre);
+			MiLista->conectados[MiLista->num].socket = socket;
+			MiLista->num++;
 			return 0;
 		
 		}
 	}
 
 
-	int DesconectarUsuario (char nombre[20], ListaConectados *MiLista)
+	int DesconectarUsuario (ListaConectados *MiLista, char nombre[20])
 	{
 		int found=0;
 		int i=0;
@@ -65,21 +62,28 @@ typedef struct
 	
 	}
 
-	void ShowConectados(char respuesta[512], ListaConectados *MiLista)
+	void ShowConectados(char respuesta[512])
 	{
 		pthread_mutex_lock(&mutex);
 		char respuestaAUX[200];
-		sprintf(respuesta,"%d/",MiLista->num);
+		sprintf(respuesta,"6|%d/",MiLista.num);
 		int i; 
-		for (i=0; i<MiLista->num; i++)
+		for (i=0; i<MiLista.num; i++)
 		{
-			sprintf(respuestaAUX,"%s%s/",respuestaAUX,MiLista->conectados[i].nombre);
+			sprintf(respuestaAUX,"%s%s/",respuestaAUX,MiLista.conectados[i].nombre);
 		}
 		respuestaAUX[strlen(respuestaAUX)-1] = '\0';
 		strcat(respuesta,respuestaAUX);
 		printf("%s <-respuesta\n",respuesta);
+		printf("\n");
 		pthread_mutex_unlock(&mutex);
 	}
+	
+	/*funcion que envia la lista de conectados a todos los conectados cada vez que alguien se conecta o DesconectarUsuario
+		EN el apartado LogIn y DesconectarUsuario hay que meter una llamada a esta funcion
+		Esta funcion ha de recorrer toda la lista de conectados e imprimir un mensaje tipo "NUMERO/usuario1/usuario2/..." como respuesta (LLAMADA A ShowConectados)
+	*/
+	
 	
 	
 	void JugadorConMasVictorias(MYSQL *conn, char respuesta[512])
@@ -101,16 +105,17 @@ typedef struct
 		
 		
 		if (row == NULL)
-			printf ("No se han obtenido datos en la consulta\n");
+			sprintf (respuesta,"3|No se han obtenido datos en la consulta\n");
 		else
 		{
 			printf ("Jugador que ha conseguido el mayor número de victorias:\n");	
 			victorias = atoi(row[1]);
 			
-			sprintf (respuesta,"%s con un total de %d victorias.\n", row[0],victorias);
+			sprintf (respuesta,"3|%s con un total de %d victorias.\n", row[0],victorias);
 			row = mysql_fetch_row (resultado);
 		}
 		pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
+		printf("\n");
 	}
 	
 	
@@ -120,7 +125,7 @@ typedef struct
 		MYSQL_RES *resultado;
 		MYSQL_ROW row;
 		int puntos;
-		memset(respuesta, 0, 512);
+		char respuestaAUX[200];
 		
 		// consulta SQL para obtener una tabla con todos los datos
 		// de la base de datos
@@ -142,13 +147,14 @@ typedef struct
 			
 		{
 			printf ("Username: %s, puntos: %s\n", row[0], row[1]);
-			sprintf(respuesta,"%s%s %s/",respuesta,row[0],row[1]);
+			sprintf(respuestaAUX,"%s%s %s/",respuestaAUX,row[0],row[1]);
 			// obtenemos la siguiente fila
 			
 			row = mysql_fetch_row (resultado);
-			pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
 		}
-		respuesta[strlen(respuesta)-1] = '\0';
+		respuestaAUX[strlen(respuestaAUX)-1] = '\0';
+		sprintf(respuesta,"4|%s",respuestaAUX);
+		pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
 	}
 	
 	
@@ -223,12 +229,13 @@ typedef struct
 			printf ("El usuario %s ha jugado un total de %d partidas ganando %d.\n", nombre, partidas, ganadas);
 			printf("El WINRATE de %s es del %.2f%\n",nombre,winrate);
 				
-			sprintf(respuesta,"%.2f%\n",winrate);	
+			sprintf(respuesta,"5|%.2f%\n",winrate);	
 			printf ("Respuesta: %s\n",respuesta);
+			printf("\n");
 			pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
 	}
 	
-	void LogIn(MYSQL *conn, char respuesta[512], char nombre[20], char password[20], int sock_conn, ListaConectados MiLista)
+	void LogIn(MYSQL *conn, char respuesta[512], char nombre[20], char password[20], int sock_conn)
 	{
 		MYSQL_RES *resultado;
 		MYSQL_ROW row;
@@ -237,7 +244,7 @@ typedef struct
 		p = strtok(NULL, "/");
 		strcpy (password, p);
 		
-		char consulta [100];
+		char consulta [512];
 		sprintf (consulta,"SELECT jugadores.username FROM (jugadores) WHERE jugadores.username = '%s' AND jugadores.password = '%s';", nombre, password); 
 		
 		int err=mysql_query (conn, consulta);
@@ -254,29 +261,27 @@ typedef struct
 		if (row == NULL)
 		{
 			printf ("Error, nombre o contraseña incorrectos\n");
-			strcpy(respuesta,"Nombre o contraseña incorrectos\n");
+			strcpy(respuesta,"1|Nombre o contraseña incorrectos\n");
 		}
 		else
-		{
-			printf ("Nombre del jugador\n");
-			printf ("Username: %s\n", row[0]);
-			int res = PonConectado(nombre,sock_conn,MiLista);
-			printf("1\n");
+		{			
+			pthread_mutex_lock(&mutex);
+			int res = PonConectado(&MiLista,nombre,sock_conn);
+			pthread_mutex_unlock(&mutex);
 			if (res==-1)
 			{
-				sprintf(respuesta, "Log in failed, tabla llena\n");
+				sprintf(respuesta, "1|Log in failed, tabla llena\n");
 			}
 			else
 			{
-				printf("2\n");
-				sprintf(respuesta,"Logueado correctamente");
-				printf("3\n");
+				sprintf(respuesta,"1|Logueado correctamente");
 			}
 		}
+		printf("%s\n",respuesta);
 		printf("\n");
 	}
 	
-	void SignIn(MYSQL *conn, char respuesta[512], char nombre[20], char password[20], int sock_conn, ListaConectados *MiLista)
+	void SignIn(MYSQL *conn, char respuesta[512], char nombre[20], char password[20], int sock_conn)
 	{
 		pthread_mutex_lock( &mutex ); //No me interrumpas ahora
 		MYSQL_RES *resultado;
@@ -286,8 +291,6 @@ typedef struct
 		strcpy (password, p);
 		char consulta [100];
 		char consulta2 [100];
-		
-		
 		int ID;			
 		
 		sprintf(consulta2,"SELECT (COUNT(jugadores.username))+1 FROM (jugadores)");
@@ -305,12 +308,10 @@ typedef struct
 		if (row == NULL)
 			printf ("No se han obtenido datos en la consulta\n");
 		else
-			while (row !=NULL){
-				
+			if (row !=NULL){
 				ID = atoi (row[0]);
-				
 				row = mysql_fetch_row (resultado);
-		}
+			}
 			
 			sprintf(consulta, "INSERT INTO jugadores VALUES(%d,'%s','%s',0,0)",ID,nombre,password);
 			
@@ -320,14 +321,15 @@ typedef struct
 				printf ("Error al consultar datos de la base %u %s\n",
 						mysql_errno(conn), mysql_error(conn));
 				exit (1);
-				pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
 			}
 			
-			sprintf(respuesta,"Registrado\n");
+			sprintf(respuesta,"2|Registrado\n");
+			printf("\n");
+			pthread_mutex_unlock(&mutex); //ya puedes interrumpirme
 	}
 	
 
-void *AtenderCliente (void *socket, ListaConectados MiLista)
+void *AtenderCliente (void *socket)
 {
 	int sock_conn;
 	int *s;
@@ -337,7 +339,7 @@ void *AtenderCliente (void *socket, ListaConectados MiLista)
 	char peticion[512];
 	char respuesta[512];
 	int ret;
-	memset(respuesta, 0, 512);
+	
 	
 	MYSQL *conn;
 	int err;
@@ -351,7 +353,7 @@ void *AtenderCliente (void *socket, ListaConectados MiLista)
 		exit (1);
 	}
 	
-	conn = mysql_real_connect (conn, "shiva2.upc.es","root", "mysql", "T3_BBDDJuego",0, NULL, 0);
+	conn = mysql_real_connect (conn, "localhost","root", "mysql", "Juego",0, NULL, 0);
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n",
 				mysql_errno(conn), mysql_error(conn));
@@ -363,6 +365,7 @@ void *AtenderCliente (void *socket, ListaConectados MiLista)
 	//hasta que se desconecte
 	while (terminar ==0)
 	{
+		memset(respuesta, 0, 512);
 		// Ahora recibimos su peticion
 		ret=read(sock_conn,peticion, sizeof(peticion));
 		printf ("Recibida una petición\n");
@@ -387,33 +390,36 @@ void *AtenderCliente (void *socket, ListaConectados MiLista)
 		switch(codigo)
 		{
 		case 0:
-			DesconectarUsuario(nombre, &MiLista);
+			DesconectarUsuario(&MiLista,nombre);
 			terminar=1;
 			break;
 		case 1:
 			JugadorConMasVictorias(conn,respuesta);
+			write (sock_conn,respuesta,strlen(respuesta));
 			break;
 		case 2:
 			RankingUpperLower(conn,respuesta);
+			write (sock_conn,respuesta,strlen(respuesta));
 			break;
 		case 3:
 			WinRate(conn,respuesta,nombre);
+			write (sock_conn,respuesta,strlen(respuesta));
 			break;
 		case 4:
-			LogIn(conn,respuesta,nombre,password,sock_conn, MiLista);
-			printf("1\n");
+			LogIn(conn,respuesta,nombre,password,sock_conn);
+			write (sock_conn,respuesta,strlen(respuesta));
+			
 			break;
 		case 5:
-			SignIn(conn,respuesta,nombre,password,sock_conn, &MiLista);
+			SignIn(conn,respuesta,nombre,password,sock_conn);
+			write (sock_conn,respuesta,strlen(respuesta));
 			break;
 		case 6:
-			ShowConectados(respuesta,&MiLista);
 			break;
 		default:
 			break;
 		}
-		printf ("final?\n");
-		write (sock_conn,respuesta,strlen(respuesta));
+		
 	}
 	mysql_close (conn);
 	
@@ -440,7 +446,7 @@ int main(int argc, char *argv[])
 	//htonl formatea el numero que recibe al formato necesario
 	serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
 	// escucharemos en el port 9050
-	serv_adr.sin_port = htons(50056);
+	serv_adr.sin_port = htons(9052);
 	if (bind(sock_listen, (struct sockaddr *) &serv_adr, sizeof(serv_adr)) < 0)
 		printf ("Error al bind");
 	//La cola de peticiones pendientes no podr? ser superior a 4

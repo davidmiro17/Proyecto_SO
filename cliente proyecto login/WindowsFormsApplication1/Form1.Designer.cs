@@ -273,7 +273,6 @@
             this.Conectados.TabIndex = 1;
             this.Conectados.Text = "Conectados";
             this.Conectados.UseVisualStyleBackColor = true;
-            this.Conectados.Click += new System.EventHandler(this.Conectados_Click);
             // 
             // Jugar
             // 
