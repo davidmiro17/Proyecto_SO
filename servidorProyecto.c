@@ -27,6 +27,7 @@ typedef struct
 ListaConectados MiLista;
 
 	int PonConectado (ListaConectados *MiLista, char nombre[20], int socket)
+		///jjjjj
 	{
 		if (MiLista->num == 100)
 			return -1;
@@ -43,6 +44,7 @@ ListaConectados MiLista;
 
 	int DesconectarUsuario (ListaConectados *MiLista, char nombre[20])
 	{
+		printf("%s\n",nombre);
 		int found=0;
 		int i=0;
 		while((found==0)&&(i<MiLista->num))
@@ -50,7 +52,7 @@ ListaConectados MiLista;
 			if(strcmp(nombre,MiLista->conectados[i].nombre)==0)
 			{
 				found==1;
-				for (int j=0;j<MiLista->num;j++)
+				for (int j=i;j<MiLista->num;j++)
 				{
 					strcpy(MiLista->conectados[j].nombre,MiLista->conectados[j+1].nombre);
 					MiLista->conectados[j].socket=MiLista->conectados[j+1].socket;
@@ -65,7 +67,8 @@ ListaConectados MiLista;
 	void ShowConectados(char respuesta[512])
 	{
 		pthread_mutex_lock(&mutex);
-		char respuestaAUX[200];
+		char respuestaAUX[512];
+		memset(respuestaAUX, 0, 512);
 		sprintf(respuesta,"6|%d/",MiLista.num);
 		int i; 
 		for (i=0; i<MiLista.num; i++)
@@ -74,7 +77,7 @@ ListaConectados MiLista;
 		}
 		respuestaAUX[strlen(respuestaAUX)-1] = '\0';
 		strcat(respuesta,respuestaAUX);
-		printf("%s <-respuesta\n",respuesta);
+		printf("%s\n",respuesta);
 		printf("\n");
 		pthread_mutex_unlock(&mutex);
 	}
@@ -108,14 +111,15 @@ ListaConectados MiLista;
 			sprintf (respuesta,"3|No se han obtenido datos en la consulta\n");
 		else
 		{
-			printf ("Jugador que ha conseguido el mayor número de victorias:\n");	
 			victorias = atoi(row[1]);
 			
 			sprintf (respuesta,"3|%s con un total de %d victorias.\n", row[0],victorias);
 			row = mysql_fetch_row (resultado);
 		}
-		pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
+		printf("%s\n",respuesta);
 		printf("\n");
+		pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
+		
 	}
 	
 	
@@ -126,7 +130,7 @@ ListaConectados MiLista;
 		MYSQL_ROW row;
 		int puntos;
 		char respuestaAUX[200];
-		
+		memset(respuestaAUX, 0, 200);
 		// consulta SQL para obtener una tabla con todos los datos
 		// de la base de datos
 		int err=mysql_query (conn, "SELECT jugadores.username,jugadores.puntos FROM (jugadores)ORDER  BY puntos DESC");
@@ -153,7 +157,10 @@ ListaConectados MiLista;
 			row = mysql_fetch_row (resultado);
 		}
 		respuestaAUX[strlen(respuestaAUX)-1] = '\0';
+		printf("%s\n",respuestaAUX);
 		sprintf(respuesta,"4|%s",respuestaAUX);
+		printf("%s\n",respuesta);
+		printf("\n");
 		pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
 	}
 	
@@ -230,7 +237,7 @@ ListaConectados MiLista;
 			printf("El WINRATE de %s es del %.2f%\n",nombre,winrate);
 				
 			sprintf(respuesta,"5|%.2f%\n",winrate);	
-			printf ("Respuesta: %s\n",respuesta);
+			printf("%s\n",respuesta);
 			printf("\n");
 			pthread_mutex_unlock( &mutex); //ya puedes interrumpirme
 	}
@@ -239,7 +246,6 @@ ListaConectados MiLista;
 	{
 		MYSQL_RES *resultado;
 		MYSQL_ROW row;
-		printf("\n");
 		char *p;
 		p = strtok(NULL, "/");
 		strcpy (password, p);
@@ -248,7 +254,6 @@ ListaConectados MiLista;
 		sprintf (consulta,"SELECT jugadores.username FROM (jugadores) WHERE jugadores.username = '%s' AND jugadores.password = '%s';", nombre, password); 
 		
 		int err=mysql_query (conn, consulta);
-		printf("\n");			
 		if (err!=0) {
 			printf ("Error, nombre o contraseña incorrectos %u %s\n",
 					mysql_errno(conn), mysql_error(conn));
@@ -338,6 +343,7 @@ void *AtenderCliente (void *socket)
 	
 	char peticion[512];
 	char respuesta[512];
+	char notificacion[512];
 	int ret;
 	
 	
@@ -366,6 +372,7 @@ void *AtenderCliente (void *socket)
 	while (terminar ==0)
 	{
 		memset(respuesta, 0, 512);
+		memset(notificacion, 0, 512);
 		// Ahora recibimos su peticion
 		ret=read(sock_conn,peticion, sizeof(peticion));
 		printf ("Recibida una petición\n");
@@ -391,6 +398,11 @@ void *AtenderCliente (void *socket)
 		{
 		case 0:
 			DesconectarUsuario(&MiLista,nombre);
+			
+			ShowConectados(notificacion);
+			for (int j = 0; j < MiLista.num; j++)
+				write(MiLista.conectados[j].socket,notificacion,strlen(notificacion));
+			
 			terminar=1;
 			break;
 		case 1:
@@ -409,12 +421,18 @@ void *AtenderCliente (void *socket)
 			LogIn(conn,respuesta,nombre,password,sock_conn);
 			write (sock_conn,respuesta,strlen(respuesta));
 			
+			ShowConectados(notificacion);
+			for (int j = 0; j < MiLista.num; j++)
+				write(MiLista.conectados[j].socket,notificacion,strlen(notificacion));
+			
 			break;
 		case 5:
 			SignIn(conn,respuesta,nombre,password,sock_conn);
 			write (sock_conn,respuesta,strlen(respuesta));
 			break;
 		case 6:
+			ShowConectados(respuesta);
+			write (sock_conn,respuesta,strlen(respuesta));
 			break;
 		default:
 			break;
