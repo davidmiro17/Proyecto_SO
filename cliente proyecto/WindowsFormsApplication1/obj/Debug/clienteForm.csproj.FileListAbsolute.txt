@@ -190,3 +190,15 @@ C:\Users\cesar\OneDrive\Escritorio\Proyecto_SO-3.1-dev\cliente proyecto login\Wi
 C:\Users\cesar\OneDrive\Escritorio\Proyecto_SO-3.1-dev\cliente proyecto login\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.CoreCompileInputs.cache
 C:\Users\cesar\OneDrive\Escritorio\Proyecto_SO-3.1-dev\cliente proyecto login\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.exe
 C:\Users\cesar\OneDrive\Escritorio\Proyecto_SO-3.1-dev\cliente proyecto login\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.pdb
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.AssemblyReference.cache
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.SuggestedBindingRedirects.cache
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Form1.resources
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Form2.resources
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.Properties.Resources.resources
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.GenerateResource.cache
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.CoreCompileInputs.cache
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.exe
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.pdb
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe.config
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.exe
+C:\Users\dmiro\Desktop\Proyecto_SO-main\cliente proyecto\WindowsFormsApplication1\bin\Debug\WindowsFormsApplication1.pdb

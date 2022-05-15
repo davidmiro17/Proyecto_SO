@@ -9,6 +9,7 @@
 #include <string.h>
 #include <pthread.h>
 
+
 //Estructura necesaria para acceso excluyente
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -41,7 +42,40 @@ ListaConectados MiLista;
 		}
 	}
 
-
+	
+	
+	int DameSocket (ListaConectados *MiLista, char nombre[20])
+	{
+		//Funcion que devuelve el socket
+		int i=0;
+		int encontrado = 0;
+		while ((i < MiLista->num) && (!encontrado))
+		{
+			if (strcmp(MiLista->conectados[i].nombre, nombre) == 0)
+				encontrado =1;
+			if (!encontrado)
+				i=i+1;
+		}
+		if (encontrado)
+			return MiLista->conectados[i].socket;
+		else
+			return -1;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	int DesconectarUsuario (ListaConectados *MiLista, char nombre[20])
 	{
 		printf("%s\n",nombre);
@@ -113,7 +147,7 @@ ListaConectados MiLista;
 		{
 			victorias = atoi(row[1]);
 			
-			sprintf (respuesta,"3|%s con un total de %d victorias.\n", row[0],victorias);
+			sprintf (respuesta,"3|%s   de %d victorias.\n", row[0],victorias);
 			row = mysql_fetch_row (resultado);
 		}
 		printf("%s\n",respuesta);
@@ -333,10 +367,96 @@ ListaConectados MiLista;
 			pthread_mutex_unlock(&mutex); //ya puedes interrumpirme
 	}
 	
-
+	
+	//
+	//El usuario envia el nombre al cliente  del invitador. Ejemplo: David invita a Cesar (7|David)
+	//
+	
+	void Invitacion (ListaConectados *MiLista, char nombre[20], int sock_inv, char respuesta) 
+		
+		
+	{
+		char invitado [20];
+		char *p;
+		p =strtok(NULL, "/");
+		strcpy(nombre,p);
+		p =strtok(NULL, "/");
+		strcpy(invitado,p);
+		
+	
+		sock_inv = DameSocket(MiLista,invitado);
+		sprintf(respuesta,"7|%s/",nombre);
+		
+		printf("%s\n",respuesta);
+		printf("\n");
+		
+		
+	 
+	}
+		
+		
+	
+	//
+	//El invitado le envia al usuario que crea la invitacion su respuesta de si acepta o no. Ejemplo: Cesar acepta la invitacion de David (8/David|0)
+	//
+	
+	
+	int RespuestaAInvitacion(ListaConectados *MiLista, char usrinvitado[20], char nombre[20], int sock_inv, char respuesta [512])
+	{
+		
+		
+		char p;
+		p=strtok(NULL, "/");
+		strcpy(usrinvitado,p);
+		
+		int acepta;
+		p=strtok(NULL, "/");
+		acepta = atoi(p);
+		printf("%d",acepta);
+		
+		if (acepta == 0)
+		{
+			sock_inv = DameSocket(&MiLista,usrinvitado);
+			sprintf(respuesta,"8|%s/0", nombre);
+			write(sock_inv, respuesta, strlen(respuesta));
+			
+		}
+		else
+		{
+			sock_inv = DameSocket(MiLista,usrinvitado);
+			sprintf(respuesta,"8|%s/1", nombre);
+			write(sock_inv, respuesta, strlen(respuesta));
+		}
+		
+	}
+	
+	
+	void Chat(ListaConectados *MiLista, char respuesta)
+	{   char *p;
+		int sock;
+		char usuario[20];
+		p=strtok(NULL, "/");
+		strcpy(usuario,p);
+		
+		char mensaje[200];
+		p=strtok(NULL, "/");
+		strcpy(mensaje,p);
+		
+		sprintf(respuesta, "9|%s/%s", usuario, mensaje);
+		
+		sock = DameSocket(&MiLista,usuario);
+		for (int i=0; i<MiLista->num ; i++)
+		{
+			write (MiLista->conectados[i].socket, respuesta , strlen(respuesta));
+		}
+	}
+	
+	
+	
 void *AtenderCliente (void *socket)
 {
 	int sock_conn;
+	int sock_inv;
 	int *s;
 	s= (int *) socket;
 	sock_conn= *s;
@@ -345,7 +465,7 @@ void *AtenderCliente (void *socket)
 	char respuesta[512];
 	char notificacion[512];
 	int ret;
-	
+	char invitado;
 	
 	MYSQL *conn;
 	int err;
@@ -387,6 +507,7 @@ void *AtenderCliente (void *socket)
 		int codigo =  atoi (p);
 		char nombre[20];
 		char password[20];
+		char usrinvitado [20];
 		if ((codigo !=0)&&(codigo !=6))
 		{
 			p = strtok( NULL, "/");
@@ -424,7 +545,6 @@ void *AtenderCliente (void *socket)
 			ShowConectados(notificacion);
 			for (int j = 0; j < MiLista.num; j++)
 				write(MiLista.conectados[j].socket,notificacion,strlen(notificacion));
-			
 			break;
 		case 5:
 			SignIn(conn,respuesta,nombre,password,sock_conn);
@@ -433,6 +553,17 @@ void *AtenderCliente (void *socket)
 		case 6:
 			ShowConectados(respuesta);
 			write (sock_conn,respuesta,strlen(respuesta));
+			break;
+		case 7:
+			Invitacion(&MiLista,nombre,sock_inv,respuesta);
+			write (sock_inv,respuesta,strlen(respuesta));
+			break;
+		case 8:
+		    RespuestaAInvitacion(&MiLista,usrinvitado,nombre,sock_inv,respuesta);
+		    write(sock_inv, respuesta, strlen(respuesta));
+			break;
+		case 9:
+			Chat(&MiLista,respuesta);
 			break;
 		default:
 			break;
