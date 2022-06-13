@@ -21,11 +21,122 @@ typedef struct
 
 typedef struct 
 {
-	Conectado conectados [100];
+	Conectado conectados [250];
 	int num;
 } ListaConectados;
 
+typedef struct
+{
+	Conectado jugadores [4];
+	int id;
+	int libre;
+} TMulti;
+
+typedef TMulti TPartidas[100];
+
+
 ListaConectados MiLista;
+TPartidas MiTabla;
+
+	void IniciarTabla()
+	{
+		for (int i=0; i<100; i++)
+		{
+			MiTabla[i].libre=0;
+			MiTabla[i].id=i;
+		}
+	}
+	
+	int CrearPartida (char listajugadores[200], int socket) //devuelve -1 si no hay hueco para mas partidas, o el id de la partida
+	{
+		int i=0;
+		int encontrado=0;
+		while(i<100 && encontrado==0)
+		{
+			if(MiTabla[i].libre==0)
+			{
+				encontrado=1;
+				MiTabla[i].libre=1;
+			}
+			else
+			   i++;
+		}
+		if(encontrado=0)
+			  return -1;
+		else
+		{
+			int j=0;
+			int encontrado=0;
+			while(j<MiLista.num && encontrado==0)
+			{
+				if(MiLista.conectados[j].socket==socket)
+				{
+					encontrado=1;
+				}
+				else
+				   j++;
+			}
+			strcpy(MiTabla[i].jugadores[0].nombre,MiLista.conectados[j].nombre);
+			MiTabla[i].jugadores[0].socket=socket;
+			printf("Host socket: %d\n",MiTabla[i].jugadores[0].socket);
+			char copia[200];
+			strcpy(copia,listajugadores);
+			char *p = strtok(copia, "-");
+			int k=1;
+			while(p!=NULL)
+			{
+				strcpy(MiTabla[i].jugadores[k].nombre,p);
+				j=0;
+				encontrado=0;
+				while(j<MiLista.num && encontrado==0)
+				{
+					if(strcmp(MiLista.conectados[j].nombre,p)==0)
+					{
+						encontrado=1;
+					}
+					else
+					   j++;
+				}	
+				MiTabla[i].jugadores[k].socket=MiLista.conectados[j].socket;
+				k++;
+				p=strtok(NULL,"-");
+			}
+			return MiTabla[i].id;
+		}
+	}
+	
+	void EliminarDePartida(char nombre[20], int partida_id)
+	{
+		int encontrado=0;
+		int i =0;
+		while ((strcmp(MiTabla[partida_id].jugadores[i].nombre,"")!=0)&&(encontrado=0))
+		{
+			if(strcmp(MiTabla[partida_id].jugadores[i].nombre,nombre)==0)
+				encontrado=1;
+			else
+				i++;
+		}
+		if (encontrado==1)
+		{
+			while ((strcmp(MiTabla[partida_id].jugadores[i].nombre,"")!=0))
+			{
+				strcpy(MiTabla[partida_id].jugadores[i].nombre,MiTabla[partida_id].jugadores[i+1].nombre);
+				MiTabla[partida_id].jugadores[i].socket=MiTabla[partida_id].jugadores[i+1].socket;
+				i++;
+			}
+		}
+	}
+	
+	void EliminarPartida(int id)
+	{
+		int i=0;
+		while(i<4)
+		{
+			strcpy(MiTabla[id].jugadores[i].nombre, "");
+			MiTabla[id].jugadores[i].socket = -1;
+			i++;
+		}
+	}
 
 	int PonConectado (ListaConectados *MiLista, char nombre[20], int socket)
 		///jjjjj
@@ -49,14 +160,14 @@ ListaConectados MiLista;
 		//Funcion que devuelve el socket
 		int i=0;
 		int encontrado = 0;
-		while ((i < MiLista->num) && (!encontrado))
+		while ((i < MiLista->num) && (encontrado==0))
 		{
 			if (strcmp(MiLista->conectados[i].nombre, nombre) == 0)
 				encontrado =1;
-			if (!encontrado)
+			else
 				i=i+1;
 		}
-		if (encontrado)
+		if (encontrado==1)
 			return MiLista->conectados[i].socket;
 		else
 			return -1;
@@ -369,87 +480,157 @@ ListaConectados MiLista;
 	
 	
 	//
-	//El usuario envia el nombre al cliente  del invitador. Ejemplo: David invita a Cesar (7|David)
+	//El usuario envia el nombre al cliente  del invitador a la que quiere invitar. Ejemplo: David invita a Cesar (7/Cesar)
 	//
 	
-	void Invitacion (ListaConectados *MiLista, char nombre[20], int sock_inv, char respuesta) 
-		
-		
+	void Invitacion (char nombre[512], int sock_inv, char respuesta[512]) 	
 	{
-		char invitado [20];
-		char *p;
-		p =strtok(NULL, "/");
-		strcpy(nombre,p);
-		p =strtok(NULL, "/");
-		strcpy(invitado,p);
-		
-	
-		sock_inv = DameSocket(MiLista,invitado);
-		sprintf(respuesta,"7|%s/",nombre);
-		
+		sprintf(respuesta,"7|%s\n", nombre);
 		printf("%s\n",respuesta);
-		printf("\n");
-		
-		
-	 
 	}
 		
 		
 	
 	//
-	//El invitado le envia al usuario que crea la invitacion su respuesta de si acepta o no. Ejemplo: Cesar acepta la invitacion de David (8/David|0)
+	//El invitado le envia al usuario que crea la invitacion su respuesta de si acepta o no. Ejemplo: Cesar acepta la invitacion de David (8/David)
 	//
 	
 	
-	int RespuestaAInvitacion(ListaConectados *MiLista, char usrinvitado[20], char nombre[20], int sock_inv, char respuesta [512])
+	void RespuestaAInvitacion(ListaConectados *MiLista, char usrinvitado [20], int sock_conn, char respuesta [512], int partida_id)
 	{
 		
-		
-		char p;
-		p=strtok(NULL, "/");
-		strcpy(usrinvitado,p);
-		
+		char respuesta2[512];
+		char *p;
 		int acepta;
 		p=strtok(NULL, "/");
 		acepta = atoi(p);
-		printf("%d",acepta);
-		
+		printf("acepta: %d\n",acepta);
+		sprintf(respuesta2, "12|%s", usrinvitado);
 		if (acepta == 0)
 		{
-			sock_inv = DameSocket(&MiLista,usrinvitado);
-			sprintf(respuesta,"8|%s/0", nombre);
-			write(sock_inv, respuesta, strlen(respuesta));
-			
+			sprintf(respuesta,"8|%d/%s/0",partida_id, usrinvitado);
+			int i=0;
+			while(strcmp(MiTabla[partida_id].jugadores[i].nombre,"")!=0)
+			{
+				write(MiTabla[partida_id].jugadores[i].socket, respuesta2, strlen(respuesta2));
+				i++;
+			}
 		}
 		else
 		{
-			sock_inv = DameSocket(MiLista,usrinvitado);
-			sprintf(respuesta,"8|%s/1", nombre);
-			write(sock_inv, respuesta, strlen(respuesta));
+			sprintf(respuesta,"8|%d/%s/1",partida_id, usrinvitado);
+			EliminarDePartida(usrinvitado,partida_id);
 		}
-		
 	}
 	
 	
-	void Chat(ListaConectados *MiLista, char respuesta)
-	{   char *p;
-		int sock;
-		char usuario[20];
-		p=strtok(NULL, "/");
-		strcpy(usuario,p);
+	
+	
+	
+	
+	void EliminarUsuario (MYSQL *conn, char respuesta[512], char nombre[20], char password[20], int sock_conn)
+	{
+		MYSQL_RES *resultado;
+		MYSQL_ROW row;
+		char *p;
+		p = strtok(NULL, "/");
+		strcpy (password, p);
+		char consulta [512];
 		
-		char mensaje[200];
-		p=strtok(NULL, "/");
-		strcpy(mensaje,p);
 		
-		sprintf(respuesta, "9|%s/%s", usuario, mensaje);
 		
-		sock = DameSocket(&MiLista,usuario);
-		for (int i=0; i<MiLista->num ; i++)
+		
+		
+		strcpy (consulta, "SELECT jugadores.username FROM (jugadores) WHERE jugadores.username='");
+		strcat (consulta, nombre); 
+		strcat (consulta, "'");
+		strcat (consulta, " AND jugadores.password='"); 
+		strcat (consulta, password); 
+		strcat (consulta, "';");
+		
+		printf("consulta = %s\n", consulta);
+		
+		
+		
+		
+		
+		
+		int err=mysql_query (conn, consulta);
+		if (err!=0) {
+			printf ("El username y el password no coinciden %u %s\n", mysql_errno(conn), mysql_error(conn));
+			exit (1);
+		}
+		
+		resultado = mysql_store_result (conn);
+		row = mysql_fetch_row (resultado);
+		
+		if (row == NULL)
 		{
-			write (MiLista->conectados[i].socket, respuesta , strlen(respuesta));
+			printf ("El USERNAME y el PASSWORD no coinciden\n");
+			strcpy(respuesta,"10|El usuario no ha podido loguearse, revise si el username y la password coinciden.");
+			return -1;
+			
+		}
+		
+		else
+		{
+			
+			while (row != NULL)
+			{
+			
+			    strcpy (consulta, "DELETE FROM jugadores WHERE jugadores.username='");
+				strcat (consulta, nombre); 
+			    strcat (consulta, "';");
+				
+				printf("consulta = %s\n", consulta);
+				
+				strcpy(respuesta,"10|El usuario ha sido eliminado de la base de datos ");
+				
+				
+				err = mysql_query(conn, consulta);
+				
+			
+				err = mysql_query(conn, consulta);
+				if (err!=0)
+				{
+					printf ("Error al modificar datos la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+					strcpy(respuesta,"10|El usuario no ha sido eliminado de la base de datos ");
+					return -1;
+					exit (1);
+				}
+			    
+				printf("\n");
+				printf("Despues de dar baja al jugador deseado la BBDD queda de la siguiente forma:\n");
+				err=mysql_query (conn, "SELECT * FROM jugadores");
+				if (err!=0) 
+				{
+					printf ("Error al consultar datos de la base %u %s\n", mysql_errno(conn), mysql_error(conn));
+					exit (1);
+				}
+				
+				resultado = mysql_store_result (conn);
+				row = mysql_fetch_row (resultado);
+				
+				if (row == NULL)
+				{
+					printf ("No se han obtenido datos en la consulta\n");
+				}
+				
+				else
+					while (row !=NULL) 
+				{
+						printf ("Username: %s\n", row[1]);
+						row = mysql_fetch_row (resultado);							
+				}
+			
+		   }
+			
 		}
 	}
+	
+	
+	
+
 	
 	
 	
@@ -494,6 +675,8 @@ void *AtenderCliente (void *socket)
 		memset(respuesta, 0, 512);
 		memset(notificacion, 0, 512);
 		// Ahora recibimos su peticion
+		printf("\n");
+		printf ("Esperando peticion\n");
 		ret=read(sock_conn,peticion, sizeof(peticion));
 		printf ("Recibida una petición\n");
 		// Tenemos que a?adirle la marca de fin de string 
@@ -505,14 +688,18 @@ void *AtenderCliente (void *socket)
 		printf ("La petición es: %s\n",peticion);
 		char *p = strtok(peticion, "/");
 		int codigo =  atoi (p);
+		int res;
 		char nombre[20];
 		char password[20];
 		char usrinvitado [20];
-		if ((codigo !=0)&&(codigo !=6))
+		char usuario[20];
+		char mensaje[200];
+		char listajugadores[200];
+		if ((codigo !=0)&&(codigo !=6)&&(codigo !=7)&&(codigo !=8)&&(codigo !=9)&&(codigo !=11))
 		{
 			p = strtok( NULL, "/");
 			strcpy (nombre, p);
-			printf ("Codigo: %d, Nombre: %s\n", codigo, nombre);
+			printf ("Codigo: %d, Nombre: %s, socket: %d\n", codigo, nombre, sock_conn);
 			
 		}
 		switch(codigo)
@@ -554,16 +741,65 @@ void *AtenderCliente (void *socket)
 			ShowConectados(respuesta);
 			write (sock_conn,respuesta,strlen(respuesta));
 			break;
-		case 7:
-			Invitacion(&MiLista,nombre,sock_inv,respuesta);
-			write (sock_inv,respuesta,strlen(respuesta));
+		case 7:			
+			p=strtok(NULL,"/");
+			sprintf(listajugadores,"%s",p);
+			printf("%s\n",listajugadores);
+			
+			int partida_id = CrearPartida(listajugadores,sock_conn);
+			sprintf(respuesta,"7|%d/%s/%s",partida_id,MiTabla[partida_id].jugadores[0].nombre,listajugadores);
+			printf("%s\n",respuesta);
+			int i=1;
+			while(strcmp(MiTabla[partida_id].jugadores[i].nombre,"")!=0)
+			{
+				write(MiTabla[partida_id].jugadores[i].socket,respuesta,strlen(respuesta));
+				i++;
+			}
 			break;
 		case 8:
-		    RespuestaAInvitacion(&MiLista,usrinvitado,nombre,sock_inv,respuesta);
-		    write(sock_inv, respuesta, strlen(respuesta));
+			p=strtok(NULL,"/");
+			partida_id=atoi(p);
+			p=strtok(NULL,"/");
+			strcpy(usrinvitado,p);
+			RespuestaAInvitacion(&MiLista,usrinvitado,sock_conn,respuesta,partida_id);
+			write (sock_conn,respuesta,strlen(respuesta));
+			
 			break;
 		case 9:
-			Chat(&MiLista,respuesta);
+			p=strtok(NULL, "/");
+			strcpy(usuario,p);
+			
+			p=strtok(NULL, "/");
+			strcpy(mensaje,p);
+			
+			sprintf(respuesta, "9|%s/%s", usuario, mensaje);
+			
+			for (int i=0; i<MiLista.num ; i++)
+			{
+				write (MiLista.conectados[i].socket, respuesta , strlen(respuesta));
+			}
+			break;
+		case 10:
+			EliminarUsuario(conn,respuesta,nombre,password,sock_conn);
+			write (sock_conn,respuesta,strlen(respuesta));
+			break;
+		case 11:
+			p=strtok(NULL, "/");
+			partida_id=atoi(p);
+			p=strtok(NULL, "/");
+			strcpy(usuario,p);
+			
+			p=strtok(NULL, "/");
+			strcpy(mensaje,p);
+			
+			sprintf(respuesta, "11|%d/%s/%s",partida_id, usuario, mensaje);
+			printf("%s\n", respuesta);
+			i=0;
+			while(strcmp(MiTabla[partida_id].jugadores[i].nombre,"")!=0)
+			{
+				write(MiTabla[partida_id].jugadores[i].socket, respuesta, strlen(respuesta));
+				i++;
+			}
 			break;
 		default:
 			break;
@@ -606,6 +842,7 @@ int main(int argc, char *argv[])
 	int sockets[100];
 	pthread_t thread;
 	i=0;
+	IniciarTabla();
 	
 	// Atenderemos infinitas peticiones
 	

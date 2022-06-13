@@ -18,11 +18,7 @@ namespace WindowsFormsApplication1
         Socket server;
         Thread atender;
         string message;
-        string invitado;
-        string texto;
-        List<String> invitados = new List<String>(); //lista de invitados
-
-        delegate void DelegadoParaChat(string[] trozos);
+        int id_partida;
 
         public Form1()
         {
@@ -50,14 +46,6 @@ namespace WindowsFormsApplication1
 
         }
 
-        private void PonMensaje(string [] trozos)
-        {
-            invitado = trozos[0];
-            texto = trozos[1];
-            texto = trozos[0] + " : " + texto;
-            listBox1.Items.Add(texto);
-        }
-
 
 
 
@@ -67,6 +55,9 @@ namespace WindowsFormsApplication1
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            groupBox1.Enabled = false;
+            groupBox3.Enabled = false;
+            ChatPrivado.Enabled = false;
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
             //al que deseamos conectarnos
             IPAddress direc = IPAddress.Parse("192.168.56.102");
@@ -78,6 +69,11 @@ namespace WindowsFormsApplication1
             try
             {
                 server.Connect(ipep);//Intentamos conectar el socket
+                this.BackColor = Color.Green;
+
+                ThreadStart ts = delegate { atender_mensajes_servidor(); };
+                atender = new Thread(ts);
+                atender.Start();
             }
             catch (SocketException)
             {
@@ -85,11 +81,7 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("No he podido conectar con el servidor");
                 return;
             }
-            this.BackColor = Color.Green;
-
-            ThreadStart ts = delegate { atender_mensajes_servidor(); };
-            atender = new Thread(ts);
-            atender.Start();
+            
         }
 
         private void atender_mensajes_servidor()
@@ -117,8 +109,12 @@ namespace WindowsFormsApplication1
                         if (mensaje2 == "Logueado correctamente")
                         {
                             MessageBox.Show(mensaje2);
-                            groupBox1.Enabled = true;
-                            groupBox3.Enabled = true;
+                            this.Invoke(new Action(() =>
+                            {
+                                groupBox1.Enabled = true;
+                                groupBox3.Enabled = true;
+                            }));
+                            
                         }
                         else
                             MessageBox.Show(mensaje2);
@@ -148,17 +144,20 @@ namespace WindowsFormsApplication1
                     break;
                     case 7:
                         DialogResult respuesta;
-                        respuesta = MessageBox.Show(mensaje2 + " te ha invitado.", "Invitación", MessageBoxButtons.OKCancel);
+                        string[] parte = mensaje2.Split('/');
+                        int id_partida = Convert.ToInt32(parte[0]);
+                        
+                        respuesta = MessageBox.Show(parte[1] + " te ha invitado a jugar con:" + parte[2].Replace('-',' '), "Invitación", MessageBoxButtons.OKCancel);
                         if (respuesta == DialogResult.OK)
                         {
-                            string mensaje = "7|" + mensaje2 + "/0";
+                            string mensaje = "8/" + id_partida + "/" + textBox1.Text + "/0";
                             // Enviamos al servidor el nombrepor teclado
                             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                             server.Send(msg);
                         }
                         else
                         {
-                            string mensaje = "7|" + mensaje2 + "/1";
+                            string mensaje = "8/" + id_partida + "/" + textBox1.Text + "/1";
                             // Enviamos al servidor el nombre tecleado
                             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                             server.Send(msg);
@@ -167,20 +166,50 @@ namespace WindowsFormsApplication1
                     break;
                     case 8:
                         string[] piezas = mensaje2.Split('/');
-                        int acepta = Convert.ToInt32(piezas[1]);
+                        int acepta = Convert.ToInt32(piezas[2]);
                         if (acepta == 0)
                         {
-                            MessageBox.Show(piezas[0] + " ha aceptado la invitación");
-                            invitado = piezas[0];
+                            MessageBox.Show(piezas[1] + " ha aceptado la invitación");
+                            this.Invoke(new Action(() =>
+                            {
+                                ChatPrivado.Enabled = true;
+                            }));
                         }
                         else
-                            MessageBox.Show(piezas[0] + " ha rechazado la invitación");
+                            MessageBox.Show(piezas[1] + " ha rechazado la invitación");
                         break;
                     case 9:
+                        string[] partes = mensaje2.Split('/');
+                        string texto = partes[0] +": " + partes[1];
+                        this.Invoke(new Action(() =>
+                        {
+                            listBox2.Items.Add(texto);
+                        }));
+                        break;
+                    case 10:
+                        if (mensaje2 == "Usuario eliminado")
+                        {
+                            MessageBox.Show(mensaje2);
+                        
+                        }
+                        else
+                            MessageBox.Show(mensaje2);
+                        break;
+                    case 11:
+                        partes = mensaje2.Split('/');
+                        texto = partes[1] + ": " + partes[2];
+                        this.Invoke(new Action(() =>
+                        {
+                            listBox1.Items.Add(texto);
+                        }));
+                        break;
+                    case 12:
                         piezas = mensaje2.Split('/');
-                        DelegadoParaChat delegadoChat = new DelegadoParaChat(PonMensaje);
-                        listBox1.Invoke(delegadoChat, new object[] { piezas });
-                    break;
+                        this.Invoke(new Action(() =>
+                        {
+                            listBox1.Items.Add("        " + piezas[0] + " se ha unido al lobby.");
+                        }));
+                        break;
                 }
             }
             server.Shutdown(SocketShutdown.Both);
@@ -269,37 +298,50 @@ namespace WindowsFormsApplication1
 
         private void invitar_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < invitados.Count; i++)
+            ChatPrivado.Enabled = true;
+            string invitados="";
+            bool FirstValue = true;
+            foreach (DataGridViewCell cell in conectadosGrid.SelectedCells)
             {
-                message = string.Concat(invitados[i]);
+                if (!FirstValue)
+                    invitados += "-";
+                invitados += cell.Value.ToString();
+                FirstValue = false;
             }
 
-
-
-
-            string nombre = textBox1.Text;
-            string mensaje = "7/" + nombre + "/" + message;
+            string mensaje = "7/" + invitados;
+            MessageBox.Show(mensaje);
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
             server.Send(msg);
         }
 
 
-       
-
-
-        int i;
-        private void conectadosGrid_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            i = e.RowIndex;
-            DataGridViewRow row = conectadosGrid.Rows[i];
-            textBox3.Text = row.Cells[0].Value.ToString();
-            invitados.Add(textBox3.Text);
-        }
-
-
         private void chatBTN_Click(object sender, EventArgs e)
         {
-            string mensaje = "6/" + invitado + "/" + chatBox.Text;
+            
+            string mensaje = "11/" +id_partida+ "/" + textBox1.Text + "/" + chatBox.Text;
+            chatBox.Clear();
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+        }
+
+        private void Eliminar_Click(object sender, EventArgs e)
+        {
+            string nombre = textBox1.Text;
+            string password = textBox2.Text;
+            string mensaje = "10/" + nombre + "/" + password;
+            // Enviamos al servidor el nombre tecleado
+
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+            nombre = null;
+            password = null;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            string mensaje = "9/" + textBox1.Text + "/" + textBox3.Text;
+            textBox3.Clear();
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
             server.Send(msg);
         }
