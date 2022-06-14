@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WindowsFormsApplication1</RootNamespace>
     <AssemblyName>WindowsFormsApplication1</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -96,6 +96,33 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\login-button-png-15.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\png-transparent-computer-icons-button-presentation-register-button-blue-text-presentation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1783979.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\invite-friends-8.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\vecteezy_green-play-button_1186943.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\disconnect-plug.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pngtreesend_icon_3581535.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Pngtreesend_icon_35815351.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\wp_132.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
