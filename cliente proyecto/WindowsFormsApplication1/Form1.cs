@@ -28,6 +28,7 @@ namespace WindowsFormsApplication1
        
         private void PonConectados(string trozo)
         {
+            
             conectadosGrid.ColumnCount = 1;
             conectadosGrid.Rows.Clear();
             conectadosGrid.Refresh();
@@ -39,6 +40,7 @@ namespace WindowsFormsApplication1
                 for (int i = 0; i < numero; i++)
                 {
                     conectadosGrid.Rows[conectadosGrid.Rows.Add()].Cells[0].Value = usuarios[i + 1];
+                    conectadosGrid.ClearSelection();
                 }
             }
             else

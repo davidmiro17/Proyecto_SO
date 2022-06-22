@@ -246,36 +246,38 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox3.Size = new System.Drawing.Size(203, 214);
+            this.groupBox3.Size = new System.Drawing.Size(219, 214);
             this.groupBox3.TabIndex = 14;
             this.groupBox3.TabStop = false;
             // 
             // conectadosGrid
             // 
+            this.conectadosGrid.AllowUserToAddRows = false;
+            this.conectadosGrid.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.conectadosGrid.BackgroundColor = System.Drawing.SystemColors.Control;
             this.conectadosGrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.conectadosGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.conectadosGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1});
-            this.conectadosGrid.Location = new System.Drawing.Point(32, 14);
+            this.conectadosGrid.Location = new System.Drawing.Point(62, 17);
             this.conectadosGrid.Margin = new System.Windows.Forms.Padding(2);
             this.conectadosGrid.Name = "conectadosGrid";
+            this.conectadosGrid.RowHeadersVisible = false;
             this.conectadosGrid.RowHeadersWidth = 51;
-            this.conectadosGrid.Size = new System.Drawing.Size(123, 121);
+            this.conectadosGrid.Size = new System.Drawing.Size(92, 107);
             this.conectadosGrid.TabIndex = 2;
             // 
             // Column1
             // 
-            this.Column1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.Column1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.Column1.HeaderText = "Conectados";
             this.Column1.MinimumWidth = 6;
             this.Column1.Name = "Column1";
-            this.Column1.Width = 89;
             // 
             // invitar
             // 
             this.invitar.Image = global::WindowsFormsApplication1.Properties.Resources.invite_friends_8;
-            this.invitar.Location = new System.Drawing.Point(54, 155);
+            this.invitar.Location = new System.Drawing.Point(66, 150);
             this.invitar.Margin = new System.Windows.Forms.Padding(2);
             this.invitar.Name = "invitar";
             this.invitar.Size = new System.Drawing.Size(80, 44);
@@ -443,7 +445,6 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.DataGridView conectadosGrid;
         private System.Windows.Forms.Button Jugar;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.Button invitar;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.TextBox chatBox;
@@ -454,6 +455,7 @@
         private System.Windows.Forms.GroupBox ChatGlobal;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
     }
 }
 
