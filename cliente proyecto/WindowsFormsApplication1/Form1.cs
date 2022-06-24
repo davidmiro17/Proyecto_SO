@@ -32,6 +32,7 @@ namespace WindowsFormsApplication1
             conectadosGrid.ColumnCount = 1;
             conectadosGrid.Rows.Clear();
             conectadosGrid.Refresh();
+            conectadosGrid.AutoResizeColumns();
             if (trozo != null && trozo != "")
             {
                 string[] usuarios = trozo.Split('/');
@@ -41,6 +42,7 @@ namespace WindowsFormsApplication1
                 {
                     conectadosGrid.Rows[conectadosGrid.Rows.Add()].Cells[0].Value = usuarios[i + 1];
                     conectadosGrid.ClearSelection();
+                    
                 }
             }
             else
@@ -57,6 +59,7 @@ namespace WindowsFormsApplication1
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            conectadosGrid.BackgroundColor = Color.Green;
             groupBox1.Enabled = false;
             groupBox3.Enabled = false;
             ChatPrivado.Enabled = false;
