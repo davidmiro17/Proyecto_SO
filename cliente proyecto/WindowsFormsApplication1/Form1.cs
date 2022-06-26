@@ -63,6 +63,14 @@ namespace WindowsFormsApplication1
             groupBox1.Enabled = false;
             groupBox3.Enabled = false;
             ChatPrivado.Enabled = false;
+            ChatGlobal.Visible = false;
+            groupBox1.Visible = false;
+            groupBox3.Visible = false;
+            ChatPrivado.Visible = false;
+            Jugar.Visible = false;
+
+
+
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
             //al que deseamos conectarnos
             IPAddress direc = IPAddress.Parse("147.83.117.22");
@@ -113,9 +121,14 @@ namespace WindowsFormsApplication1
                     case 1:
                         if (mensaje2 == "Logueado correctamente")
                         {
+                            
                             MessageBox.Show(mensaje2);
                             this.Invoke(new Action(() =>
                             {
+                                ChatGlobal.Visible = true;
+                                groupBox1.Visible = true;
+                                groupBox3.Visible = true;
+                                Jugar.Visible = true;
                                 groupBox1.Enabled = true;
                                 groupBox3.Enabled = true;
                             }));
@@ -176,6 +189,7 @@ namespace WindowsFormsApplication1
                             MessageBox.Show(piezas[1] + " ha aceptado la invitación");
                             this.Invoke(new Action(() =>
                             {
+                                ChatPrivado.Visible = true;
                                 ChatPrivado.Enabled = true;
                             }));
                         }
@@ -304,6 +318,7 @@ namespace WindowsFormsApplication1
             string password = textBox2.Text;
             if ((textBox2.Text != "") && (textBox1.Text != ""))
             {
+                
                 string mensaje = "4/" + nombre + "/" + password;
                 // Enviamos al servidor el nombre tecleado
 
@@ -333,6 +348,7 @@ namespace WindowsFormsApplication1
         private void invitar_Click(object sender, EventArgs e)
         {
             ChatPrivado.Enabled = true;
+            ChatPrivado.Visible = true;
             string invitados="";
             bool FirstValue = true;
             
