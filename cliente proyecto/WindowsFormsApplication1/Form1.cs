@@ -67,7 +67,7 @@ namespace WindowsFormsApplication1
             groupBox1.Visible = false;
             groupBox3.Visible = false;
             ChatPrivado.Visible = false;
-            Jugar.Visible = false;
+            Conectar.Visible = false;
 
 
 
@@ -128,7 +128,7 @@ namespace WindowsFormsApplication1
                                 ChatGlobal.Visible = true;
                                 groupBox1.Visible = true;
                                 groupBox3.Visible = true;
-                                Jugar.Visible = true;
+                                Conectar.Visible = true;
                                 groupBox1.Enabled = true;
                                 groupBox3.Enabled = true;
                             }));
@@ -339,8 +339,41 @@ namespace WindowsFormsApplication1
 
         private void Jugar_Click(object sender, EventArgs e)
         {
-            Form2 f2 = new Form2();
-            f2.ShowDialog();
+            conectadosGrid.BackgroundColor = Color.Green;
+            groupBox1.Enabled = false;
+            groupBox3.Enabled = false;
+            ChatPrivado.Enabled = false;
+            ChatGlobal.Visible = false;
+            groupBox1.Visible = false;
+            groupBox3.Visible = false;
+            ChatPrivado.Visible = false;
+            Conectar.Visible = false;
+
+
+
+            //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
+            //al que deseamos conectarnos
+            IPAddress direc = IPAddress.Parse("147.83.117.22");
+            IPEndPoint ipep = new IPEndPoint(direc, 50056);
+
+
+            //Creamos el socket 
+            server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                server.Connect(ipep);//Intentamos conectar el socket
+                this.BackColor = Color.Green;
+
+                ThreadStart ts = delegate { atender_mensajes_servidor(); };
+                atender = new Thread(ts);
+                atender.Start();
+            }
+            catch (SocketException)
+            {
+                //Si hay excepcion imprimimos error y salimos del programa con return 
+                MessageBox.Show("No he podido conectar con el servidor");
+                return;
+            }
         }
 
 

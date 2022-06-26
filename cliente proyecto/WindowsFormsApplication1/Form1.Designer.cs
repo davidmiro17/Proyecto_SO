@@ -56,7 +56,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.listBox2 = new System.Windows.Forms.ListBox();
-            this.Jugar = new System.Windows.Forms.Button();
+            this.Conectar = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -382,16 +382,16 @@
             this.listBox2.Size = new System.Drawing.Size(149, 108);
             this.listBox2.TabIndex = 19;
             // 
-            // Jugar
+            // Conectar
             // 
-            this.Jugar.Image = global::WindowsFormsApplication1.Properties.Resources.vecteezy_green_play_button_1186943;
-            this.Jugar.Location = new System.Drawing.Point(586, 75);
-            this.Jugar.Margin = new System.Windows.Forms.Padding(2);
-            this.Jugar.Name = "Jugar";
-            this.Jugar.Size = new System.Drawing.Size(78, 38);
-            this.Jugar.TabIndex = 0;
-            this.Jugar.UseVisualStyleBackColor = true;
-            this.Jugar.Click += new System.EventHandler(this.Jugar_Click);
+            this.Conectar.Image = global::WindowsFormsApplication1.Properties.Resources.vecteezy_green_play_button_1186943;
+            this.Conectar.Location = new System.Drawing.Point(586, 75);
+            this.Conectar.Margin = new System.Windows.Forms.Padding(2);
+            this.Conectar.Name = "Conectar";
+            this.Conectar.Size = new System.Drawing.Size(78, 38);
+            this.Conectar.TabIndex = 0;
+            this.Conectar.UseVisualStyleBackColor = true;
+            this.Conectar.Click += new System.EventHandler(this.Jugar_Click);
             // 
             // button1
             // 
@@ -412,7 +412,7 @@
             this.Controls.Add(this.ChatGlobal);
             this.Controls.Add(this.ChatPrivado);
             this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.Jugar);
+            this.Controls.Add(this.Conectar);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -454,7 +454,7 @@
         private System.Windows.Forms.Button registro;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.DataGridView conectadosGrid;
-        private System.Windows.Forms.Button Jugar;
+        private System.Windows.Forms.Button Conectar;
         private System.Windows.Forms.Button invitar;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.TextBox chatBox;
