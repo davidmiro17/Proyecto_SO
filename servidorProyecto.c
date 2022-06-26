@@ -395,6 +395,10 @@ TPartidas MiTabla;
 		p = strtok(NULL, "/");
 		strcpy (password, p);
 		
+		
+			
+		
+	
 		char consulta [512];
 		sprintf (consulta,"SELECT jugadores.username FROM (jugadores) WHERE jugadores.username = '%s' AND jugadores.password = '%s';", nombre, password); 
 		
@@ -429,7 +433,10 @@ TPartidas MiTabla;
 		}
 		printf("%s\n",respuesta);
 		printf("\n");
+	
 	}
+	
+	
 	
 	void SignIn(MYSQL *conn, char respuesta[512], char nombre[20], char password[20], int sock_conn)
 	{

@@ -124,7 +124,6 @@ namespace WindowsFormsApplication1
                         else
                             MessageBox.Show(mensaje2);
                         break;
-                    
                     case 2:
                         MessageBox.Show(mensaje2);
                         break;
@@ -225,33 +224,42 @@ namespace WindowsFormsApplication1
 
         private void button2_Click(object sender, EventArgs e)
         {
-           
+            if (nombre.Text == "")
+            {
 
-            if (Victorias.Checked)
-            {
-                // Quiere el jugador con mas victorias
-                string mensaje = "1/" + nombre.Text;
-                // Enviamos al servidor el nombre tecleado
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
-            }
+                MessageBox.Show("Escribe un nombre sobre el que realizar la consulta");
 
-            if (Ranking.Checked)
-            {
-                
-                string mensaje = "2/" + nombre.Text;
-                // Enviamos al servidor el nombre tecleado
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
-                
             }
-            else if (WinRate.Checked)
+            else
             {
-                string mensaje = "3/" + nombre.Text;
-                // Enviamos al servidor el nombre tecleado
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-                server.Send(msg);
+                if (Victorias.Checked)
+                {
+                    // Quiere el jugador con mas victorias
+                    string mensaje = "1/" + nombre.Text;
+                    // Enviamos al servidor el nombre tecleado
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                    server.Send(msg);
+                }
+
+                if (Ranking.Checked)
+                {
+
+                    string mensaje = "2/" + nombre.Text;
+                    // Enviamos al servidor el nombre tecleado
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                    server.Send(msg);
+
+                }
+                else if (WinRate.Checked)
+                {
+                    string mensaje = "3/" + nombre.Text;
+                    // Enviamos al servidor el nombre tecleado
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                    server.Send(msg);
+                }
             }
+            
+            
         }
 
 
@@ -264,6 +272,7 @@ namespace WindowsFormsApplication1
 
             // Nos desconectamos
             this.BackColor = Color.Gray;
+            conectadosGrid.BackgroundColor = Color.Gray;
             server.Shutdown(SocketShutdown.Both);
             server.Close();
             atender.Abort();
@@ -274,23 +283,43 @@ namespace WindowsFormsApplication1
         {
             string nombre = textBox1.Text;
             string password = textBox2.Text;
+            if ((textBox2.Text != "") && (textBox1.Text != ""))
+            {
+                string mensaje = "5/" + nombre + "/" + password;
+                // Enviamos al servidor el nombre tecleado
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+            }
 
-            string mensaje = "5/" + nombre + "/" + password;
-            // Enviamos al servidor el nombre tecleado
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
-            
+            else
+            {
+                MessageBox.Show("Introduce un nombre y una contraseña");
+
+            }
         }
 
         private void Login_click(object sender, EventArgs e)
         {
             string nombre = textBox1.Text;
             string password = textBox2.Text;
-            string mensaje = "4/" + nombre + "/" + password;
-            // Enviamos al servidor el nombre tecleado
+            if ((textBox2.Text != "") && (textBox1.Text != ""))
+            {
+                string mensaje = "4/" + nombre + "/" + password;
+                // Enviamos al servidor el nombre tecleado
 
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+
+            }
+
+            else
+            {
+
+                MessageBox.Show("Introduce un nombre y una contraseña");
+
+            }
+                
+
         }
 
         private void Jugar_Click(object sender, EventArgs e)
@@ -306,49 +335,92 @@ namespace WindowsFormsApplication1
             ChatPrivado.Enabled = true;
             string invitados="";
             bool FirstValue = true;
-            foreach (DataGridViewCell cell in conectadosGrid.SelectedCells)
+            
+            if (conectadosGrid.SelectedCells.Count == 0)
             {
-                if (!FirstValue)
-                    invitados += "-";
-                invitados += cell.Value.ToString();
-                FirstValue = false;
+                MessageBox.Show("Selecciona un usuario al que invitar");
             }
+            else
+            {
+                foreach (DataGridViewCell cell in conectadosGrid.SelectedCells)
+                {
+                    if (!FirstValue)
+                        invitados += "-";
+                    invitados += cell.Value.ToString();
+                    FirstValue = false;
+                }
 
-            string mensaje = "7/" + invitados;
-            MessageBox.Show(mensaje);
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
+                string mensaje = "7/" + invitados;
+                MessageBox.Show(mensaje);
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+            }
+            
         }
 
 
         private void chatBTN_Click(object sender, EventArgs e)
         {
-            
-            string mensaje = "11/" +id_partida+ "/" + textBox1.Text + "/" + chatBox.Text;
-            chatBox.Clear();
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
+            if (chatBox.Text != "")
+            {
+                string mensaje = "11/" + id_partida + "/" + textBox1.Text + "/" + chatBox.Text;
+                chatBox.Clear();
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+            }
+
+            else
+            {
+
+                MessageBox.Show("Escribe un mensaje que enviar");
+
+            }
+
+
+
         }
 
         private void Eliminar_Click(object sender, EventArgs e)
         {
             string nombre = textBox1.Text;
             string password = textBox2.Text;
-            string mensaje = "10/" + nombre + "/" + password;
-            // Enviamos al servidor el nombre tecleado
 
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
-            nombre = null;
-            password = null;
+            if ((textBox2.Text != "") && (textBox1.Text != ""))
+            {
+                string mensaje = "10/" + nombre + "/" + password;
+                // Enviamos al servidor el nombre tecleado
+
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+                nombre = null;
+                password = null;
+            }
+
+
+            else
+            {
+
+                MessageBox.Show("Introduce un nombre y una contraseña");
+
+            }
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            string mensaje = "9/" + textBox1.Text + "/" + textBox3.Text;
-            textBox3.Clear();
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
+            if (textBox3.Text != "")
+            {
+                string mensaje = "9/" + textBox1.Text + "/" + textBox3.Text;
+                textBox3.Clear();
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+
+            }
+            else
+            {
+
+                MessageBox.Show("Escribe un mensaje que enviar");
+
+            }
         }
     }
 }
