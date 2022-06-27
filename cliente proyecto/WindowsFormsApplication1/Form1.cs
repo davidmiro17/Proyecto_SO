@@ -68,7 +68,7 @@ namespace WindowsFormsApplication1
             groupBox3.Visible = false;
             ChatPrivado.Visible = false;
             Conectar.Visible = false;
-
+            groupBox2.Visible = true;
 
 
             //Creamos un IPEndPoint con el ip del servidor y puerto del servidor 
@@ -96,6 +96,33 @@ namespace WindowsFormsApplication1
             }
             
         }
+
+
+
+
+        private void Form1_Close(object sender, EventArgs e)
+        {
+
+
+            //Mensaje de desconexión
+            string mensaje = "0/";
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+
+            // Nos desconectamos
+            this.BackColor = Color.Gray;
+            conectadosGrid.BackgroundColor = Color.Gray;
+            server.Shutdown(SocketShutdown.Both);
+            server.Close();
+            atender.Abort();
+
+
+
+
+
+
+        }
+
 
         private void atender_mensajes_servidor()
         {
@@ -128,7 +155,6 @@ namespace WindowsFormsApplication1
                                 ChatGlobal.Visible = true;
                                 groupBox1.Visible = true;
                                 groupBox3.Visible = true;
-                                Conectar.Visible = true;
                                 groupBox1.Enabled = true;
                                 groupBox3.Enabled = true;
                             }));
@@ -279,6 +305,17 @@ namespace WindowsFormsApplication1
 
         private void button1_Click(object sender, EventArgs e)
         {
+
+            ChatGlobal.Visible = false;
+            groupBox1.Visible = false;
+            groupBox2.Visible = false;
+            groupBox3.Visible = false;
+            ChatPrivado.Visible = false;
+            button1.Visible = false;
+            Conectar.Visible = true;
+
+
+
             //Mensaje de desconexión
             string mensaje = "0/";
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
@@ -346,6 +383,8 @@ namespace WindowsFormsApplication1
             ChatGlobal.Visible = false;
             groupBox1.Visible = false;
             groupBox3.Visible = false;
+            groupBox2.Visible = true;
+            button1.Visible = true;
             ChatPrivado.Visible = false;
             Conectar.Visible = false;
 
@@ -393,6 +432,7 @@ namespace WindowsFormsApplication1
             {
                 foreach (DataGridViewCell cell in conectadosGrid.SelectedCells)
                 {
+                    
                     if (!FirstValue)
                         invitados += "-";
                     invitados += cell.Value.ToString();
@@ -470,7 +510,60 @@ namespace WindowsFormsApplication1
                 MessageBox.Show("Escribe un mensaje que enviar");
 
             }
+        
         }
+
+
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            string invitados = "";
+            bool FirstValue = true;
+
+            if (conectadosGrid.SelectedCells.Count == 0)
+            {
+                MessageBox.Show("Selecciona un usuario al que invitar");
+            }
+            else
+            {
+                foreach (DataGridViewCell cell in conectadosGrid.SelectedCells)
+                {
+                    if (!FirstValue)
+                        invitados += "-";
+                    invitados += cell.Value.ToString();
+                    FirstValue = false;
+                }
+
+                string mensaje = "13/" + id_partida + "/" + textBox1.Text + "/" + invitados;
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+            }
+        }
+
+       
+        
+        private void button6_Click(object sender, EventArgs e)
+        {
+            string mensaje = "14/" + id_partida;
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+        }
+
+
+
+
+
+
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string mensaje = "12/" + id_partida + "/" + textBox1.Text;
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+        }
+
+
+
     }
 }
 
