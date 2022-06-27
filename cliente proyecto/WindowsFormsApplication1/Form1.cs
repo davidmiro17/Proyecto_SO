@@ -534,8 +534,14 @@ namespace WindowsFormsApplication1
         }
 
 
+        private void button6_Click_1(object sender, EventArgs e)
+        {
+            string mensaje = "14/" + id_partida;
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+        }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void button4_Click_1(object sender, EventArgs e)
         {
             string invitados = "";
             bool FirstValue = true;
@@ -558,32 +564,15 @@ namespace WindowsFormsApplication1
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
                 server.Send(msg);
             }
+
         }
 
-       
-        
-        private void button6_Click(object sender, EventArgs e)
-        {
-            string mensaje = "14/" + id_partida;
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
-        }
-
-
-
-
-
-
-
-        private void button5_Click(object sender, EventArgs e)
+        private void button5_Click_1(object sender, EventArgs e)
         {
             string mensaje = "12/" + id_partida + "/" + textBox1.Text;
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
             server.Send(msg);
         }
-
-
-
     }
 }
 

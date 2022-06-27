@@ -991,7 +991,7 @@ void *AtenderCliente (void *socket)
 			p=strtok(NULL,"/");
 			partida_id=atoi(p);
 			EliminarPartida(partida_id);
-			sprintf(respuesta,"15|El chat ha finalizado");
+			sprintf(respuesta,"16|El chat ha finalizado");
 			while(strcmp(MiTabla[partida_id].jugadores[i].nombre,"")!=0)
 			{
 				write(MiTabla[partida_id].jugadores[i].socket, respuesta, strlen(respuesta));

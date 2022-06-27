@@ -51,6 +51,9 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.chatBox = new System.Windows.Forms.TextBox();
             this.ChatPrivado = new System.Windows.Forms.GroupBox();
+            this.button6 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
             this.chatBTN = new System.Windows.Forms.Button();
             this.ChatGlobal = new System.Windows.Forms.GroupBox();
             this.button3 = new System.Windows.Forms.Button();
@@ -58,9 +61,6 @@
             this.listBox2 = new System.Windows.Forms.ListBox();
             this.Conectar = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -336,6 +336,36 @@
             this.ChatPrivado.TabStop = false;
             this.ChatPrivado.Text = "Chat Privado";
             // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(95, 28);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(91, 23);
+            this.button6.TabIndex = 21;
+            this.button6.Text = "Eliminar chat";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click_1);
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(192, 28);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 23);
+            this.button5.TabIndex = 20;
+            this.button5.Text = "Salirse";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click_1);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(18, 26);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(71, 25);
+            this.button4.TabIndex = 19;
+            this.button4.Text = "Invitar";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click_1);
+            // 
             // chatBTN
             // 
             this.chatBTN.Image = global::WindowsFormsApplication1.Properties.Resources.Pngtreesend_icon_35815351;
@@ -412,33 +442,6 @@
             this.button1.TabIndex = 12;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // button4
-            // 
-            this.button4.Location = new System.Drawing.Point(18, 26);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(71, 25);
-            this.button4.TabIndex = 19;
-            this.button4.Text = "Invitar";
-            this.button4.UseVisualStyleBackColor = true;
-            // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(192, 28);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(75, 23);
-            this.button5.TabIndex = 20;
-            this.button5.Text = "Salirse";
-            this.button5.UseVisualStyleBackColor = true;
-            // 
-            // button6
-            // 
-            this.button6.Location = new System.Drawing.Point(95, 28);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(91, 23);
-            this.button6.TabIndex = 21;
-            this.button6.Text = "Eliminar chat";
-            this.button6.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
