@@ -100,12 +100,10 @@ namespace WindowsFormsApplication1
 
 
 
-        private void Form1_Close(object sender, EventArgs e)
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-
-
             //Mensaje de desconexión
-            string mensaje = "0/";
+            string mensaje = "0/" + textBox1.Text;
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
             server.Send(msg);
 
@@ -115,12 +113,6 @@ namespace WindowsFormsApplication1
             server.Shutdown(SocketShutdown.Both);
             server.Close();
             atender.Abort();
-
-
-
-
-
-
         }
 
 
@@ -253,6 +245,34 @@ namespace WindowsFormsApplication1
                         {
                             listBox1.Items.Add("        " + piezas[0] + " se ha unido al lobby.");
                         }));
+                        break;
+                    case 13:
+                        piezas = mensaje2.Split('/');
+                        MessageBox.Show(piezas[1]);
+                        if (piezas[1] == "Saliste correctamente")
+                            this.Invoke(new Action(() =>
+                            {
+                                listBox1.Items.Clear();
+                            }));
+                        break;
+                    case 14:
+                        piezas = mensaje2.Split('/');
+                        this.Invoke(new Action(() =>
+                        {
+                            listBox1.Items.Add("        " + piezas[1] + " salió del chat.");
+                        }));
+                        break;
+                    case 15:
+                        MessageBox.Show(mensaje2);
+                        break;
+                    case 16:
+                        piezas = mensaje2.Split('/');
+                        MessageBox.Show(piezas[1]);
+                        if (piezas[1] == "El chat ha finalizado")
+                            this.Invoke(new Action(() =>
+                            {
+                                listBox1.Items.Clear();
+                            }));
                         break;
                 }
             }
