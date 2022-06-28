@@ -38,3 +38,7 @@ Versión Final generada por David Miró
 
 Versión Final verificada por César Pizarro
 
+Versión Final comunicada por Ferran Ortega
+
+URL https://youtu.be/QY9fQYOIGjk
+
